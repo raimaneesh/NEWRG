@@ -1,0 +1,52 @@
+name: Terraform Azure Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # 1. Checkout GitHub repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Install Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # 3. Login to Azure using OIDC
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: "bfdb7538-924e-43ac-9193-a29e61174234"
+          tenant-id: "1ce567c7-283d-4272-b4bd-8292e9e4cd20"
+          subscription-id: "617408c3-ce8d-4f34-a887-db4cd7d25b4e"
+
+      # 4. Initialize Terraform
+      - name: Terraform Init
+        run: terraform init
+
+      # 5. Validate Terraform code
+      - name: Terraform Validate
+        run: terraform validate
+
+      # 6. Create Terraform Plan
+      - name: Terraform Plan
+        run: terraform plan
+
+      # 7. Apply infrastructure
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
